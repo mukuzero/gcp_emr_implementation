@@ -6,7 +6,6 @@ variable "project_id" {
 variable "region" {
   description = "The region to deploy resources in"
   type        = string
-  default     = "us-central1"
 }
 
 variable "db_password" {
@@ -18,11 +17,9 @@ variable "db_password" {
 variable "db_name" {
   description = "The name of the database to create"
   type        = string
-  default     = "my-database"
 }
 
 variable "db_user" {
   description = "The name of the database user to create"
   type        = string
-  default     = "db-user"
 }

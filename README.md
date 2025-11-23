@@ -120,7 +120,10 @@ This YAML file defines the automation process.
 3.  Add the following Repository Secrets:
     *   `GOOGLE_CREDENTIALS`: Paste the *entire content* of the JSON key file you downloaded.
     *   `GCP_PROJECT_ID`: Your GCP Project ID (e.g., `my-project-123`).
+    *   `GCP_REGION`: The region to deploy to (e.g., `us-central1`).
     *   `DB_PASSWORD`: A strong password for your database user.
+    *   `DB_NAME`: The name of the database (e.g., `my-database`).
+    *   `DB_USER`: The username for the database (e.g., `db-user`).
 
 ---
 
