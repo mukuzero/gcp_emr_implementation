@@ -2,6 +2,8 @@ variables {
   project_id  = "test-project"
   db_password = "test-password"
   region      = "us-central1"
+  db_name     = "test-db"
+  db_user     = "test-user"
 }
 
 run "verify_cost_controls" {

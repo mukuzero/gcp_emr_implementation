@@ -34,6 +34,8 @@ Defines the inputs required to build the infrastructure. This makes the code reu
 *   `project_id`: Your specific GCP project ID.
 *   `region`: Defaults to `us-central1` (Iowa), which is generally cheaper and reliable.
 *   `db_password`: Marked as `sensitive = true` so Terraform hides it in logs.
+*   `db_name`: Name of the database (default: `my-database`).
+*   `db_user`: Name of the database user (default: `db-user`).
 
 ### `terraform/main.tf`
 This is where the actual resources are defined.
