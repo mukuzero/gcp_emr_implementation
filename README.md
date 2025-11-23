@@ -114,7 +114,13 @@ This YAML file defines the automation process.
 4.  Click on the Service Account > **Keys** > **Add Key** > **Create new key** > **JSON**.
 5.  Download the JSON file. **Keep this safe!**
 
-### Step 2: Configure GitHub Secrets
+### Step 2: Remote Backend Setup (Automated)
+The CI/CD pipeline is configured to **automatically create** the GCS backend bucket if it doesn't exist.
+
+1.  **Choose a Bucket Name**: Pick a unique name (e.g., `my-tf-state-12345`).
+2.  **Add Secret**: You do **NOT** need to edit `provider.tf`. Instead, add the bucket name as a GitHub Secret (see below).
+
+### Step 3: Configure GitHub Secrets
 1.  Go to your GitHub Repository.
 2.  Navigate to **Settings** > **Secrets and variables** > **Actions**.
 3.  Add the following Repository Secrets:
@@ -124,6 +130,7 @@ This YAML file defines the automation process.
     *   `DB_PASSWORD`: A strong password for your database user.
     *   `DB_NAME`: The name of the database (e.g., `my-database`).
     *   `DB_USER`: The username for the database (e.g., `db-user`).
+    *   `TF_BACKEND_BUCKET`: The unique name for your state bucket (e.g., `my-tf-state-12345`).
 
 ### Data Flow: How Secrets Reach Terraform
 It is important to understand how your secrets move from GitHub to the Terraform code securely:

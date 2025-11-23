@@ -25,10 +25,24 @@ jobs:
       - name: Terraform Format
         run: terraform fmt -check
 
+      - name: Setup Backend Bucket
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          # Authenticate gcloud
+          echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          
+          # Run setup script
+          ./scripts/setup_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
+          
+          # Cleanup key
+          rm gcloud-key.json
+
       - name: Terraform Init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}"
 
       - name: Terraform Validate
         run: terraform validate
