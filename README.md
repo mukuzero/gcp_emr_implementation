@@ -125,6 +125,19 @@ This YAML file defines the automation process.
     *   `DB_NAME`: The name of the database (e.g., `my-database`).
     *   `DB_USER`: The username for the database (e.g., `db-user`).
 
+### Data Flow: How Secrets Reach Terraform
+It is important to understand how your secrets move from GitHub to the Terraform code securely:
+
+1.  **GitHub Secrets**: You store the secret (e.g., `DB_USER`) in GitHub. It is encrypted.
+2.  **Workflow (`terraform.yml`)**: The GitHub Action maps the secret to an Environment Variable.
+    ```yaml
+    env:
+      TF_VAR_db_user: ${{ secrets.DB_USER }}
+    ```
+3.  **Terraform**: When Terraform runs, it looks for environment variables starting with `TF_VAR_`.
+    *   `TF_VAR_db_user` -> matches `variable "db_user" {}` in `variables.tf`.
+    *   The value is injected automatically.
+
 ---
 
 ## 4. The Workflow & Process
