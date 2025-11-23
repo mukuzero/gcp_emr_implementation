@@ -69,6 +69,14 @@ resource "google_sql_database_instance" "default" {
 **4. User (`google_sql_user`)**
 *   Creates a user `db-user` with the password provided via the variable.
 
+### `terraform/tests/unit.tftest.hcl`
+This file contains **Unit Tests** written in Terraform's native testing framework. It asserts that:
+*   The database tier is always `db-f1-micro`.
+*   The disk type is `PD_HDD`.
+*   Deletion protection is disabled (for this dev environment).
+
+These tests run *before* any infrastructure is deployed to catch configuration errors early.
+
 ---
 
 ## 2. CI/CD Workflow (`.github/workflows/terraform.yml`)
@@ -80,7 +88,9 @@ This YAML file defines the automation process.
     1.  **Checkout**: Downloads your code.
     2.  **Setup Terraform**: Installs the Terraform CLI.
     3.  **Terraform Init**: Initializes the working directory (downloads the Google provider).
-    4.  **Terraform Plan**: Compares your code against the real GCP environment and calculates what changes need to be made.
+    4.  **Terraform Validate**: Checks the code for syntax errors and internal consistency.
+    5.  **Terraform Test**: Runs unit tests defined in `tests/unit.tftest.hcl` to ensure cost controls (tier, disk type) are enforced.
+    6.  **Terraform Plan**: Compares your code against the real GCP environment and calculates what changes need to be made.
         *   It injects secrets (`GOOGLE_CREDENTIALS`, `DB_PASSWORD`) securely from GitHub Secrets.
 
 ---
