@@ -6,6 +6,10 @@ terraform {
     }
   }
   required_version = ">= 1.0"
+
+  backend "gcs" {
+    prefix = "terraform/state"
+  }
 }
 
 provider "google" {

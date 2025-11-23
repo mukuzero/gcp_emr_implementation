@@ -34,6 +34,8 @@ Defines the inputs required to build the infrastructure. This makes the code reu
 *   `project_id`: Your specific GCP project ID.
 *   `region`: Defaults to `us-central1` (Iowa), which is generally cheaper and reliable.
 *   `db_password`: Marked as `sensitive = true` so Terraform hides it in logs.
+*   `db_name`: Name of the database (default: `my-database`).
+*   `db_user`: Name of the database user (default: `db-user`).
 
 ### `terraform/main.tf`
 This is where the actual resources are defined.
@@ -69,6 +71,14 @@ resource "google_sql_database_instance" "default" {
 **4. User (`google_sql_user`)**
 *   Creates a user `db-user` with the password provided via the variable.
 
+### `terraform/tests/unit.tftest.hcl`
+This file contains **Unit Tests** written in Terraform's native testing framework. It asserts that:
+*   The database tier is always `db-f1-micro`.
+*   The disk type is `PD_HDD`.
+*   Deletion protection is disabled (for this dev environment).
+
+These tests run *before* any infrastructure is deployed to catch configuration errors early.
+
 ---
 
 ## 2. CI/CD Workflow (`.github/workflows/terraform.yml`)
@@ -80,7 +90,9 @@ This YAML file defines the automation process.
     1.  **Checkout**: Downloads your code.
     2.  **Setup Terraform**: Installs the Terraform CLI.
     3.  **Terraform Init**: Initializes the working directory (downloads the Google provider).
-    4.  **Terraform Plan**: Compares your code against the real GCP environment and calculates what changes need to be made.
+    4.  **Terraform Validate**: Checks the code for syntax errors and internal consistency.
+    5.  **Terraform Test**: Runs unit tests defined in `tests/unit.tftest.hcl` to ensure cost controls (tier, disk type) are enforced.
+    6.  **Terraform Plan**: Compares your code against the real GCP environment and calculates what changes need to be made.
         *   It injects secrets (`GOOGLE_CREDENTIALS`, `DB_PASSWORD`) securely from GitHub Secrets.
 
 ---
@@ -102,13 +114,36 @@ This YAML file defines the automation process.
 4.  Click on the Service Account > **Keys** > **Add Key** > **Create new key** > **JSON**.
 5.  Download the JSON file. **Keep this safe!**
 
-### Step 2: Configure GitHub Secrets
+### Step 2: Remote Backend Setup (Automated)
+The CI/CD pipeline is configured to **automatically create** the GCS backend bucket if it doesn't exist.
+
+1.  **Choose a Bucket Name**: Pick a unique name (e.g., `my-tf-state-12345`).
+2.  **Add Secret**: You do **NOT** need to edit `provider.tf`. Instead, add the bucket name as a GitHub Secret (see below).
+
+### Step 3: Configure GitHub Secrets
 1.  Go to your GitHub Repository.
 2.  Navigate to **Settings** > **Secrets and variables** > **Actions**.
 3.  Add the following Repository Secrets:
     *   `GOOGLE_CREDENTIALS`: Paste the *entire content* of the JSON key file you downloaded.
     *   `GCP_PROJECT_ID`: Your GCP Project ID (e.g., `my-project-123`).
+    *   `GCP_REGION`: The region to deploy to (e.g., `us-central1`).
     *   `DB_PASSWORD`: A strong password for your database user.
+    *   `DB_NAME`: The name of the database (e.g., `my-database`).
+    *   `DB_USER`: The username for the database (e.g., `db-user`).
+    *   `TF_BACKEND_BUCKET`: The unique name for your state bucket (e.g., `my-tf-state-12345`).
+
+### Data Flow: How Secrets Reach Terraform
+It is important to understand how your secrets move from GitHub to the Terraform code securely:
+
+1.  **GitHub Secrets**: You store the secret (e.g., `DB_USER`) in GitHub. It is encrypted.
+2.  **Workflow (`terraform.yml`)**: The GitHub Action maps the secret to an Environment Variable.
+    ```yaml
+    env:
+      TF_VAR_db_user: ${{ secrets.DB_USER }}
+    ```
+3.  **Terraform**: When Terraform runs, it looks for environment variables starting with `TF_VAR_`.
+    *   `TF_VAR_db_user` -> matches `variable "db_user" {}` in `variables.tf`.
+    *   The value is injected automatically.
 
 ---
 

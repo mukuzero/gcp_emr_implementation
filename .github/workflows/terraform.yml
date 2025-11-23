@@ -20,16 +20,44 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.0
+          terraform_version: 1.9.0
+
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Setup Backend Bucket
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          # Authenticate gcloud
+          echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          
+          # Run setup script (from terraform directory, script is in ../scripts)
+          ../scripts/setup_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
+          
+          # Cleanup key
+          rm gcloud-key.json
 
       - name: Terraform Init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}"
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Test
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: terraform test
 
       - name: Terraform Plan
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
           TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+          TF_VAR_region: ${{ secrets.GCP_REGION }}
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_db_name: ${{ secrets.DB_NAME }}
+          TF_VAR_db_user: ${{ secrets.DB_USER }}
         run: terraform plan -input=false

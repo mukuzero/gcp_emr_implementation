@@ -28,12 +28,12 @@ resource "random_id" "db_name_suffix" {
 }
 
 resource "google_sql_database" "database" {
-  name     = "my-database"
+  name     = var.db_name
   instance = google_sql_database_instance.default.name
 }
 
 resource "google_sql_user" "users" {
-  name     = "db-user"
+  name     = var.db_user
   instance = google_sql_database_instance.default.name
   password = var.db_password
 }
