@@ -16,7 +16,7 @@ if ! gcloud storage buckets describe gs://$BUCKET_NAME > /dev/null 2>&1; then
   gcloud storage buckets create gs://$BUCKET_NAME --location=$REGION
   
   echo "Enabling versioning on gs://$BUCKET_NAME..."
-  gcloud storage buckets update gs://$BUCKET_NAME --versioning-enabled
+  gcloud storage buckets update gs://$BUCKET_NAME --versioning
   
   echo "Bucket created successfully."
 else
