@@ -75,7 +75,7 @@ resource "google_sql_database_instance" "default" {
 
 This YAML file defines the automation process.
 
-*   **Trigger (`on: pull_request`)**: This workflow runs *only* when you open a Pull Request targeting the `main` branch.
+*   **Trigger (`on: pull_request`)**: This workflow runs *only* when you open a Pull Request targeting the `master` branch.
 *   **Job (`terraform`)**:
     1.  **Checkout**: Downloads your code.
     2.  **Setup Terraform**: Installs the Terraform CLI.
@@ -115,7 +115,7 @@ This YAML file defines the automation process.
 ## 4. The Workflow & Process
 
 ### Branching Strategy
-*   **`main`**: This is the "Production" branch. The code here should always represent what is currently deployed (or ready to be deployed).
+*   **`master`**: This is the "Production" branch. The code here should always represent what is currently deployed (or ready to be deployed).
 *   **`feature/your-feature-name`**: Create these branches for every new task (e.g., `feature/add-read-replica`, `feature/change-disk-size`).
 
 ### Step-by-Step Development Process
@@ -145,7 +145,7 @@ git commit -m "Increase disk size to 20GB"
 git push origin feature/upgrade-db-version
 ```
 *   Go to GitHub and click **"Compare & pull request"**.
-*   Set the **base** branch to `main` and **compare** branch to `feature/upgrade-db-version`.
+*   Set the **base** branch to `master` and **compare** branch to `feature/upgrade-db-version`.
 
 **5. Automated "Testing" (The CI Pipeline)**
 *   Once the PR is created, the **Terraform Plan** GitHub Action will automatically start.
@@ -163,13 +163,13 @@ git push origin feature/upgrade-db-version
 Currently, the automation only *plans* the changes. To apply them:
 
 **Option A: Manual Apply (Simplest for now)**
-After merging to main, pull the changes locally and run:
+After merging to master, pull the changes locally and run:
 ```bash
-git checkout main
+git checkout master
 git pull
 cd terraform
 terraform apply
 ```
 
 **Option B: Automate Apply (Advanced)**
-You can create a second GitHub Action workflow that triggers on `push` to `main` and runs `terraform apply -auto-approve`.
+You can create a second GitHub Action workflow that triggers on `push` to `master` and runs `terraform apply -auto-approve`.
