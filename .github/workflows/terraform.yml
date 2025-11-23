@@ -33,8 +33,8 @@ jobs:
           echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
           gcloud auth activate-service-account --key-file=gcloud-key.json
           
-          # Run setup script
-          ./scripts/setup_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
+          # Run setup script (from terraform directory, script is in ../scripts)
+          ../scripts/setup_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
           
           # Cleanup key
           rm gcloud-key.json
