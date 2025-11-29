@@ -451,43 +451,65 @@ Understanding the order in which resources must be created:
 This YAML file defines the automation pipeline using GitHub Actions.
 
 ```yaml
-name: Terraform CI
+name: "Terraform Plan"
 
 on:
   pull_request:
-    branches: [master]
+    branches:
+      - master
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   terraform:
+    name: "Terraform"
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-      
+        with:
+          terraform_version: 1.9.0
+
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      # ... (Backend setup steps) ...
+
       - name: Terraform Init
-        run: terraform init
-      
+        run: terraform init -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}"
+
       - name: Terraform Validate
         run: terraform validate
-      
+
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+        run: terraform apply -auto-approve -input=false
 ```
 
 **Pipeline Stages:**
 
-1. **Trigger:** Runs automatically on Pull Requests to `master` branch
-2. **Setup:** Installs Terraform CLI
-3. **Validate:** Checks syntax and configuration
-4. **Plan:** Shows what changes would be made (doesn't apply them)
+1.  **Trigger:**
+    *   Runs `terraform plan` automatically on Pull Requests to `master` branch.
+    *   Runs `terraform apply` automatically when a Pull Request is **approved**.
+2.  **Setup:** Installs Terraform CLI (v1.9.0).
+3.  **Format & Validate:** Checks code style and syntax.
+4.  **Plan:** Shows what changes would be made (runs on PR open/sync).
+5.  **Apply:** Applies the changes to GCP (runs **only** on PR approval).
 
 **Benefits:**
-- Catches errors before merging
-- Shows infrastructure changes in PR comments
-- Ensures code quality and consistency
+- Catches errors before merging.
+- Shows infrastructure changes in PR comments.
+- **Automated Deployment:** Infrastructure is updated as soon as the code is approved.
 
 ---
 

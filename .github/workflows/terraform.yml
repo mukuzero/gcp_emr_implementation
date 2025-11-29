@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - master
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   terraform:
@@ -61,3 +63,14 @@ jobs:
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
           TF_VAR_db_user: ${{ secrets.DB_USER }}
         run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+          TF_VAR_region: ${{ secrets.GCP_REGION }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_db_name: ${{ secrets.DB_NAME }}
+          TF_VAR_db_user: ${{ secrets.DB_USER }}
+        run: terraform apply -auto-approve -input=false
