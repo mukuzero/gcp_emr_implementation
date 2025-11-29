@@ -12,11 +12,11 @@ When attempting to destroy the infrastructure using `terraform destroy`, the ope
 
 **Command:**
 ```bash
-terraform destroy -var="project_id=stable-splicer-408606" \
+terraform destroy -var="project_id=********************" \
                  -var="db_password=********" \
-                 -var="db_name=ehmr" \
-                 -var="db_user=mukunthan" \
-                 -var="region=us-central1"
+                 -var="db_name=****" \
+                 -var="db_user=****" \
+                 -var="region=****"
 ```
 
 **Errors:**
@@ -71,7 +71,7 @@ The `terraform destroy` operation encountered a **race condition** during resour
 
 **Command:**
 ```bash
-gcloud sql instances list --project=stable-splicer-408606
+gcloud sql instances list --project=********************
 ```
 
 **Result:**
@@ -87,7 +87,7 @@ Listed 0 items.
 
 **Command:**
 ```bash
-gcloud compute networks peerings list --network=dataproc-sql-network --project=stable-splicer-408606
+gcloud compute networks peerings list --network=dataproc-sql-network --project=********************
 ```
 
 **Result:**
@@ -106,7 +106,7 @@ servicenetworking-googleapis-com  dataproc-sql-network  hdb6e524bb04fd3d2p-tp  s
 ```bash
 gcloud services vpc-peerings delete --network=dataproc-sql-network \
                                      --service=servicenetworking.googleapis.com \
-                                     --project=stable-splicer-408606
+                                     --project=********************
 ```
 
 **Result:**
@@ -122,13 +122,13 @@ ERROR: ... FLOW_SN_DC_RESOURCE_PREVENTING_DELETE_CONNECTION
 
 **Command:**
 ```bash
-gcloud compute networks delete dataproc-sql-network --project=stable-splicer-408606 --quiet
+gcloud compute networks delete dataproc-sql-network --project=******************** --quiet
 ```
 
 **Result:**
 ```
-ERROR: The network resource 'projects/stable-splicer-408606/global/networks/dataproc-sql-network' 
-is already being used by 'projects/stable-splicer-408606/global/addresses/private-ip-address'
+ERROR: The network resource 'projects/********************/global/networks/dataproc-sql-network' 
+is already being used by 'projects/********************/global/addresses/private-ip-address'
 ```
 
 ❌ **Failed:** VPC is being used by the global private IP address.
@@ -139,12 +139,12 @@ is already being used by 'projects/stable-splicer-408606/global/addresses/privat
 
 **Command:**
 ```bash
-gcloud compute addresses delete private-ip-address --global --project=stable-splicer-408606 --quiet
+gcloud compute addresses delete private-ip-address --global --project=******************** --quiet
 ```
 
 **Result:**
 ```
-Deleted [https://www.googleapis.com/compute/v1/projects/stable-splicer-408606/global/addresses/private-ip-address].
+Deleted [https://www.googleapis.com/compute/v1/projects/********************/global/addresses/private-ip-address].
 ```
 
 ✅ **Success:** Private IP address was deleted.
@@ -155,12 +155,12 @@ Deleted [https://www.googleapis.com/compute/v1/projects/stable-splicer-408606/gl
 
 **Command:**
 ```bash
-gcloud compute networks delete dataproc-sql-network --project=stable-splicer-408606 --quiet
+gcloud compute networks delete dataproc-sql-network --project=******************** --quiet
 ```
 
 **Result:**
 ```
-Deleted [https://www.googleapis.com/compute/v1/projects/stable-splicer-408606/global/networks/dataproc-sql-network].
+Deleted [https://www.googleapis.com/compute/v1/projects/********************/global/networks/dataproc-sql-network].
 ```
 
 ✅ **Success:** VPC network was deleted.
@@ -171,11 +171,11 @@ Deleted [https://www.googleapis.com/compute/v1/projects/stable-splicer-408606/gl
 
 **Command:**
 ```bash
-terraform destroy -var="project_id=stable-splicer-408606" \
+terraform destroy -var="project_id=********************" \
                  -var="db_password=********" \
-                 -var="db_name=ehmr" \
-                 -var="db_user=mukunthan" \
-                 -var="region=us-central1" \
+                 -var="db_name=****" \
+                 -var="db_user=****" \
+                 -var="region=****" \
                  -auto-approve
 ```
 
