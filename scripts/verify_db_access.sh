@@ -29,8 +29,7 @@ echo "Found Instance: $DB_INSTANCE_NAME"
 # 2. Get the Private IP
 echo "Fetching Private IP..."
 # Filter for type:PRIVATE to ensure we get the internal IP
-DB_IP=$(gcloud sql instances describe "$DB_INSTANCE_NAME" \
-  --format="value(ipAddresses.filter(type:PRIVATE).ipAddress)")
+DB_IP=$(gcloud sql instances describe "$DB_INSTANCE_NAME" --format="json" | jq -r '.ipAddresses[] | select(.type == "PRIVATE") | .ipAddress')
 
 if [ -z "$DB_IP" ]; then
   echo "Error: Could not find Private IP for instance $DB_INSTANCE_NAME."
