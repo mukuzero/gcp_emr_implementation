@@ -33,6 +33,7 @@ scripts/setup_db.sh
 - name: Setup Database Schema
   env:
     GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+    REGION: ${{ secrets.GCP_REGION }}
     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     DB_NAME: ${{ secrets.DB_NAME }}
     DB_USER: ${{ secrets.DB_USER }}
