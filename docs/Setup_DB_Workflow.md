@@ -501,7 +501,7 @@ env:
 
 ## Related Scripts
 
-- [`setup_backend.sh`](./Setup_Backend_Workflow.md) - Terraform backend setup
+- [`setup_terraform_backend.sh`](./Setup_Backend_Workflow.md) - Terraform backend setup
 - [`verify_db_access.sh`](../scripts/verify_db_access.sh) - Database connectivity test
 - [`generate_hospital_data.py`](./Data_Generator.md) - Generate test data
 

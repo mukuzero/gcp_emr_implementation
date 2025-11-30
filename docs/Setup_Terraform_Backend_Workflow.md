@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `setup_backend.sh` script automates the creation and configuration of the Google Cloud Storage (GCS) bucket used as the Terraform remote backend. This ensures that Terraform state files are stored securely and can be shared across team members and CI/CD pipelines.
+The `setup_terraform_backend.sh` script automates the creation and configuration of the Google Cloud Storage (GCS) bucket used as the Terraform remote backend. This ensures that Terraform state files are stored securely and can be shared across team members and CI/CD pipelines.
 
 ## Purpose
 
@@ -14,7 +14,7 @@ The `setup_backend.sh` script automates the creation and configuration of the Go
 ## Script Location
 
 ```
-scripts/setup_backend.sh
+scripts/setup_terraform_backend.sh
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ scripts/setup_backend.sh
 ### Command Line
 
 ```bash
-./scripts/setup_backend.sh <BUCKET_NAME> <REGION>
+./scripts/setup_terraform_backend.sh <BUCKET_NAME> <REGION>
 ```
 
 ### GitHub Actions
@@ -34,7 +34,7 @@ scripts/setup_backend.sh
   run: |
     echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
     gcloud auth activate-service-account --key-file=gcloud-key.json
-    ../scripts/setup_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
+    ../scripts/setup_terraform_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
     rm gcloud-key.json
 ```
 
@@ -59,7 +59,7 @@ fi
 
 **Example:**
 ```bash
-./setup_backend.sh my-tf-state-12345 us-central1
+./setup_terraform_backend.sh my-tf-state-12345 us-central1
 ```
 
 ### Step 2: Check Bucket Existence
@@ -153,7 +153,7 @@ The script is **idempotent**, meaning:
 
 ```
 ┌─────────────────────────────────────┐
-│   User/CI runs setup_backend.sh    │
+│   User/CI runs setup_terraform_backend.sh    │
 │   with BUCKET_NAME and REGION       │
 └─────────────┬───────────────────────┘
               │
@@ -210,7 +210,7 @@ The script runs as part of the "Setup Backend Bucket" step:
   run: |
     echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
     gcloud auth activate-service-account --key-file=gcloud-key.json
-    ../scripts/setup_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
+    ../scripts/setup_terraform_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
     rm gcloud-key.json
 ```
 
@@ -278,7 +278,7 @@ No environment variables are directly used by the script, but it expects:
 **Solution:**
 ```bash
 # Choose a different bucket name
-./setup_backend.sh my-tf-state-NEW-NAME us-central1
+./setup_terraform_backend.sh my-tf-state-NEW-NAME us-central1
 ```
 
 ### Issue: "Permission denied"
@@ -341,4 +341,4 @@ gcloud projects get-iam-policy <PROJECT_ID>
 
 ---
 
-**Script Source:** [`scripts/setup_backend.sh`](file:///home/mukuthans/Documents/Personal/gcp_emr_implementation/scripts/setup_backend.sh)
+**Script Source:** [`scripts/setup_terraform_backend.sh`](file:///home/mukuthans/Documents/Personal/gcp_emr_implementation/scripts/setup_terraform_backend.sh)

@@ -539,7 +539,7 @@ For transient failures:
 
 ## Related Scripts
 
-- [`setup_backend.sh`](./Setup_Backend_Workflow.md) - Terraform backend setup
+- [`setup_terraform_backend.sh`](./Setup_Backend_Workflow.md) - Terraform backend setup
 - [`setup_db.sh`](./Setup_DB_Workflow.md) - Database schema setup
 - [`generate_hospital_data.py`](./Data_Generator.md) - Test data generation
 
