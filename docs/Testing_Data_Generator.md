@@ -43,12 +43,12 @@ python3 generate_hospital_data.py
 
 The script generates synthetic hospital data in CSV format:
 
-1. **Hospitals** - 1 hospital record (configurable)
-2. **Departments** - 20 department records
-3. **Providers** - 50 provider/doctor records
-4. **Patients** - 5,000 patient records
-5. **Encounters** - 10,000 encounter records
-6. **Transactions** - 10,000 transaction records
+1. **Hospitals** - 2 hospital record (configurable)
+2. **Departments** - 20 department records (for each hospital)
+3. **Providers** - 50 provider/doctor records (for each hospital)
+4. **Patients** - 5,000 patient records (for each hospital)
+5. **Encounters** - 10,000 encounter records (for each hospital)
+6. **Transactions** - 10,000 transaction records (for each hospital)
 
 All tables include:
 - `created_at` - Timestamp of record creation
@@ -66,6 +66,11 @@ hosp1_providers.csv
 hosp1_patients.csv
 hosp1_encounters.csv
 hosp1_transactions.csv
+hosp2_departments.csv
+hosp2_providers.csv
+hosp2_patients.csv
+hosp2_encounters.csv
+hosp2_transactions.csv
 ```
 
 ## Customizing Data Volume
@@ -74,7 +79,7 @@ Edit the configuration in `generate_hospital_data.py`:
 
 ```python
 # Configuration in main() function
-NUM_HOSPITALS = 1            # Change this
+NUM_HOSPITALS = 2            # Change this
 HOSPITAL_ID = "HOSP1"
 NUM_PATIENTS = 5000          # Change this
 NUM_PROVIDERS = 50           # Change this

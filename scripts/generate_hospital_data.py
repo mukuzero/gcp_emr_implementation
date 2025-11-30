@@ -204,7 +204,7 @@ def main():
     print("=" * 60)
     
     # Configuration
-    NUM_HOSPITALS = 1
+    NUM_HOSPITALS = 2
     HOSPITAL_ID = "HOSP1"
     NUM_PATIENTS = 5000
     NUM_PROVIDERS = 50
@@ -218,7 +218,12 @@ def main():
     generate_patients(NUM_PATIENTS, HOSPITAL_ID)
     generate_encounters(NUM_ENCOUNTERS, HOSPITAL_ID, NUM_PATIENTS)
     generate_transactions(NUM_TRANSACTIONS, HOSPITAL_ID, NUM_PATIENTS)
-    
+    HOSPITAL_ID = "HOSP2"
+    generate_departments(HOSPITAL_ID)
+    generate_providers(NUM_PROVIDERS, HOSPITAL_ID)
+    generate_patients(NUM_PATIENTS, HOSPITAL_ID)
+    generate_encounters(NUM_ENCOUNTERS, HOSPITAL_ID, NUM_PATIENTS)
+    generate_transactions(NUM_TRANSACTIONS, HOSPITAL_ID, NUM_PATIENTS)
     print("=" * 60)
     print("All datasets generated successfully!")
     print("=" * 60)
