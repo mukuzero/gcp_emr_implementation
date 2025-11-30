@@ -138,53 +138,6 @@ print(df.info())
 print(df.describe())
 ```
 
-## Loading Data into PostgreSQL (Local Testing)
-
-### Step 1: Start Local PostgreSQL
-
-```bash
-# Using Docker
-docker run --name test-postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres:15
-```
-
-### Step 2: Create Database
-
-```bash
-docker exec -it test-postgres psql -U postgres -c "CREATE DATABASE test_hospital;"
-```
-
-### Step 3: Run DDL
-
-```bash
-# Copy DDL to container
-docker cp ../scripts/ddl.sql test-postgres:/tmp/
-
-# Execute DDL
-docker exec -it test-postgres psql -U postgres -d test_hospital -f /tmp/ddl.sql
-```
-
-### Step 4: Load CSV Data
-
-```python
-import pandas as pd
-import psycopg2
-
-# Connect to database
-conn = psycopg2.connect(
-    host="localhost",
-    database="test_hospital",
-    user="postgres",
-    password="password"
-)
-
-# Load patients data
-df = pd.read_csv("hosp1_patients.csv")
-df.to_sql('patients', conn, if_exists='append', index=False)
-
-print(f"Loaded {len(df)} patient records")
-conn.close()
-```
-
 ## Cleanup
 
 ### Remove Generated Files
@@ -205,22 +158,10 @@ deactivate
 rm -rf data_gen_env
 ```
 
-### Stop PostgreSQL Container
-
-```bash
-docker stop test-postgres
-docker rm test-postgres
-```
 
 ## Troubleshooting
 
-### Issue: "ModuleNotFoundError: No module named 'faker'"
 
-**Solution:** Ensure you've activated the virtual environment and installed dependencies:
-```bash
-source data_gen_env/bin/activate
-pip install pandas faker
-```
 
 ### Issue: "Permission denied" when running script
 
@@ -251,22 +192,6 @@ On a typical development machine:
 | Transactions | 10,000 | ~15 seconds |
 | **Total** | **25,071** | **~43 seconds** |
 
-## Next Steps
-
-Once local testing is complete:
-
-1. Upload generated CSVs to GCS bucket
-2. Use Dataproc to load data into Cloud SQL
-3. Verify data integrity and relationships
-4. Run analytics queries
-
-## Related Scripts
-
-- `ddl.sql` - Database schema definition
-- `setup_db.sh` - Database setup script
-- `verify_db_access.sh` - Connectivity verification
-
----
 
 **Last Updated:** 2025-11-30  
 **Script Version:** 1.0
