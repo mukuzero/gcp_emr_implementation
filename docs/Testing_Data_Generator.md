@@ -13,7 +13,7 @@ This guide explains how to test the hospital data generator script locally befor
 ### Step 1: Create Virtual Environment
 
 ```bash
-cd /home/mukuthans/Documents/Personal/gcp_emr_implementation/scripts
+cd /gcp_emr_implementation/scripts
 
 # Create virtual environment
 python3 -m venv data_gen_env
@@ -43,17 +43,24 @@ python3 generate_hospital_data.py
 
 The script generates synthetic hospital data in CSV format:
 
-1. **Departments** - 20 department records
-2. **Providers** - 50 provider/doctor records
-3. **Patients** - 5,000 patient records
-4. **Encounters** - 10,000 encounter records
-5. **Transactions** - 10,000 transaction records
+1. **Hospitals** - 1 hospital record (configurable)
+2. **Departments** - 20 department records
+3. **Providers** - 50 provider/doctor records
+4. **Patients** - 5,000 patient records
+5. **Encounters** - 10,000 encounter records
+6. **Transactions** - 10,000 transaction records
+
+All tables include:
+- `created_at` - Timestamp of record creation
+- `updated_at` - Timestamp of last update
+- `deleted_at` - NULL for active records, timestamp for soft-deleted records
 
 ## Generated Files
 
 After running the script, you'll find these CSV files in the current directory:
 
 ```
+hospitals.csv
 hosp1_departments.csv
 hosp1_providers.csv
 hosp1_patients.csv
@@ -67,6 +74,7 @@ Edit the configuration in `generate_hospital_data.py`:
 
 ```python
 # Configuration in main() function
+NUM_HOSPITALS = 1            # Change this
 HOSPITAL_ID = "HOSP1"
 NUM_PATIENTS = 5000          # Change this
 NUM_PROVIDERS = 50           # Change this
@@ -74,13 +82,24 @@ NUM_ENCOUNTERS = 10000       # Change this
 NUM_TRANSACTIONS = 10000     # Change this
 ```
 
+## Understanding Soft Deletes
+
+All generated records include soft delete support:
+- `deleted_at = None` - Active record
+- `deleted_at = <timestamp>` - Soft-deleted record
+
+To "delete" a record, set `deleted_at` to current timestamp instead of removing it from the database.
+
 ## Testing Individual Functions
 
 You can test individual data generation functions:
 
 ```python
 # In Python interactive shell
-from generate_hospital_data import generate_patients, generate_departments
+from generate_hospital_data import generate_hospitals, generate_patients, generate_departments
+
+# Generate only hospitals
+generate_hospitals(num_hospitals=1)
 
 # Generate only patients
 generate_patients(num_records=100, hospital_id="TEST")
@@ -171,7 +190,7 @@ conn.close()
 ### Remove Generated Files
 
 ```bash
-rm hosp1_*.csv
+rm hospitals.csv hosp1_*.csv
 ```
 
 ### Deactivate Virtual Environment
@@ -224,10 +243,13 @@ On a typical development machine:
 
 | Dataset | Records | Generation Time |
 |---------|---------|-----------------|
+| Hospitals | 1 | <1 second |
+| Departments | 20 | <1 second |
+| Providers | 50 | ~2 seconds |
 | Patients | 5,000 | ~10 seconds |
 | Encounters | 10,000 | ~15 seconds |
 | Transactions | 10,000 | ~15 seconds |
-| **Total** | **25,000+** | **~40 seconds** |
+| **Total** | **25,071** | **~43 seconds** |
 
 ## Next Steps
 

@@ -2,7 +2,7 @@
 
 """
 Hospital Data Generator using Faker
-Generates synthetic hospital data including patients, encounters, transactions, 
+Generates synthetic hospital data including hospitals, patients, encounters, transactions, 
 departments, and providers for testing purposes.
 """
 
@@ -14,6 +14,31 @@ from datetime import datetime
 # Initialize Faker
 fake = Faker()
 Faker.seed(42)  # For reproducibility
+
+def generate_hospitals(num_hospitals=1):
+    """Generate hospital records"""
+    print(f"Generating {num_hospitals} hospital records...")
+    
+    hospital_names = [
+        "General", "Memorial", "Regional", "Community", "University",
+        "Medical Center", "St. Mary's", "Sacred Heart", "City", "County"
+    ]
+    
+    data = {
+        "hospitalID": [f"HOSP{str(i)}" for i in range(1, num_hospitals + 1)],
+        "Name": [f"{random.choice(hospital_names)} Hospital {i}" for i in range(1, num_hospitals + 1)],
+        "Address": [fake.address().replace('\n', ', ') for _ in range(num_hospitals)],
+        "PhoneNumber": [fake.phone_number() for _ in range(num_hospitals)],
+        "created_at": [datetime.now()] * num_hospitals,
+        "updated_at": [datetime.now()] * num_hospitals,
+        "deleted_at": [None] * num_hospitals
+    }
+    
+    df = pd.DataFrame(data)
+    filename = "hospitals.csv"
+    df.to_csv(filename, index=False)
+    print(f"Saved {filename}")
+    return df
 
 def generate_patients(num_records=50000, hospital_id="HOSP1"):
     """Generate patient records"""
@@ -179,13 +204,15 @@ def main():
     print("=" * 60)
     
     # Configuration
+    NUM_HOSPITALS = 1
     HOSPITAL_ID = "HOSP1"
     NUM_PATIENTS = 5000
     NUM_PROVIDERS = 50
     NUM_ENCOUNTERS = 10000
     NUM_TRANSACTIONS = 10000
     
-    # Generate all datasets
+    # Generate all datasets in proper order
+    generate_hospitals(NUM_HOSPITALS)
     generate_departments(HOSPITAL_ID)
     generate_providers(NUM_PROVIDERS, HOSPITAL_ID)
     generate_patients(NUM_PATIENTS, HOSPITAL_ID)
