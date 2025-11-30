@@ -4,20 +4,40 @@ set -e
 
 # Configuration - can be overridden by environment variables
 DB_INSTANCE_NAME_PREFIX="${DB_INSTANCE_NAME_PREFIX:-low-tier-db-instance}"
-DB_NAME="${DB_NAME:-ehmr}"
-DB_USER="${DB_USER:-mukunthan}"
 DDL_FILE="${DDL_FILE:-./scripts/ddl.sql}"
-REGION="${REGION:-us-central1}"
-# DB_PASSWORD should be set as environment variable (from GitHub secrets)
+
+# Required environment variables (no defaults for security)
+# REGION - GCP region (from GitHub secrets)
+# DB_NAME - Database name (from GitHub secrets)
+# DB_USER - Database username (from GitHub secrets)
+# DB_PASSWORD - Database password (from GitHub secrets)
 
 echo "================================================================"
 echo "Cloud SQL Database Setup Script"
 echo "================================================================"
 
 # Validate required environment variables
+if [ -z "$REGION" ]; then
+  echo "Error: REGION environment variable is not set."
+  echo "Please set REGION before running this script."
+  exit 1
+fi
+
 if [ -z "$DB_PASSWORD" ]; then
   echo "Error: DB_PASSWORD environment variable is not set."
   echo "Please set DB_PASSWORD before running this script."
+  exit 1
+fi
+
+if [ -z "$DB_NAME" ]; then
+  echo "Error: DB_NAME environment variable is not set."
+  echo "Please set DB_NAME before running this script."
+  exit 1
+fi
+
+if [ -z "$DB_USER" ]; then
+  echo "Error: DB_USER environment variable is not set."
+  echo "Please set DB_USER before running this script."
   exit 1
 fi
 

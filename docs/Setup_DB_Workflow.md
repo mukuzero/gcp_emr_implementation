@@ -47,9 +47,11 @@ scripts/setup_db.sh
 ### Local Testing
 
 ```bash
+# All four are required
+export REGION="us-central1"
 export DB_PASSWORD="your-password"
-export DB_NAME="ehmr"
-export DB_USER="mukunthan"
+export DB_NAME="your-database-name"
+export DB_USER="your-username"
 ./scripts/setup_db.sh
 ```
 
@@ -58,46 +60,65 @@ export DB_USER="mukunthan"
 ### Step 1: Configuration & Environment Variables
 
 ```bash
+# Optional - can be overridden by environment variables
 DB_INSTANCE_NAME_PREFIX="${DB_INSTANCE_NAME_PREFIX:-low-tier-db-instance}"
-DB_NAME="${DB_NAME:-ehmr}"
-DB_USER="${DB_USER:-mukunthan}"
 DDL_FILE="${DDL_FILE:-./scripts/ddl.sql}"
-REGION="${REGION:-us-central1}"
-# DB_PASSWORD should be set as environment variable
+
+# Required environment variables (no defaults for security)
+# REGION - GCP region (from GitHub secrets)
+# DB_NAME - Database name (from GitHub secrets)
+# DB_USER - Database username (from GitHub secrets)
+# DB_PASSWORD - Database password (from GitHub secrets)
 ```
 
 **What happens:**
-- Sets default values for configuration variables
-- Allows overriding via environment variables
-- Uses parameter expansion syntax `${VAR:-default}`
+- Sets default values for **optional** configuration variables
+- Requires **REGION**, **DB_NAME**, **DB_USER**, and **DB_PASSWORD** to be set as environment variables
+- No defaults for critical configuration to enforce explicit setup
 
 **Available overrides:**
-- `DB_INSTANCE_NAME_PREFIX` - Prefix for Cloud SQL instance name search
-- `DB_NAME` - Target database name
-- `DB_USER` - Database username
-- `DDL_FILE` - Path to DDL script
-- `REGION` - GCP region
-- `DB_PASSWORD` - **Required** database password (no default)
+- `DB_INSTANCE_NAME_PREFIX` - Prefix for Cloud SQL instance name search (default: `low-tier-db-instance`)
+- `DDL_FILE` - Path to DDL script (default: `./scripts/ddl.sql`)
 
-### Step 2: Validate Environment Variables
+**Required (no defaults):**
+- `REGION` - GCP region
+- `DB_NAME` - Target database name
+- `DB_USER` - Database username  
+- `DB_PASSWORD` - Database password
+
+### Step 2: Validate Required Environment Variables
 
 ```bash
+if [ -z "$REGION" ]; then
+  echo "Error: REGION environment variable is not set."
+  exit 1
+fi
+
 if [ -z "$DB_PASSWORD" ]; then
   echo "Error: DB_PASSWORD environment variable is not set."
-  echo "Please set DB_PASSWORD before running this script."
+  exit 1
+fi
+
+if [ -z "$DB_NAME" ]; then
+  echo "Error: DB_NAME environment variable is not set."
+  exit 1
+fi
+
+if [ -z "$DB_USER" ]; then
+  echo "Error: DB_USER environment variable is not set."
   exit 1
 fi
 ```
 
 **What happens:**
-- Checks if `DB_PASSWORD` is set
-- Exits with error if missing
-- Prevents script from running without authentication
+- Checks if all required variables are set
+- Exits with error if any are missing
+- Validates REGION first, then credentials
 
 **Why this matters:**
-- Security: Avoids hardcoding passwords in script
-- CI/CD: Forces explicit secret configuration
-- Error prevention: Fails early instead of during connection attempt
+- **Security**: Forces explicit configuration, no hardcoded credentials
+- **Consistency**: Ensures all deployments use correct region
+- **Error prevention**: Fails early with clear error messages
 
 ### Step 3: Validate DDL File Exists
 
@@ -233,7 +254,7 @@ fi
 - `-h 127.0.0.1` - Connect to localhost (proxy)
 - `-p 5432` - Use port 5432
 - `-U "$DB_USER"` - Username (e.g., mukunthan)
-- `-d "$DB_NAME"` - Database name (e.g., ehmr)
+- `-d "$DB_NAME"` - Database name (e.g., ****)
 - `-f "$DDL_FILE"` - Execute SQL from file
 
 **Success output:**
@@ -471,10 +492,11 @@ CREATE TABLE IF NOT EXISTS patients (
 
 Create a `.env` file for local testing:
 ```bash
-# .env
+# .env - All four required
+export REGION="us-central1"
 export DB_PASSWORD="local-password"
-export DB_NAME="ehmr"
-export DB_USER="mukunthan"
+export DB_NAME="your-database-name"
+export DB_USER="your-username"
 export DB_INSTANCE_NAME_PREFIX="local-db-instance"
 ```
 
