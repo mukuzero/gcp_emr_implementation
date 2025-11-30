@@ -494,14 +494,6 @@ jobs:
       - name: Terraform Apply
         if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
         run: terraform apply -auto-approve -input=false
-
-      - name: Verify Database Connectivity
-        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
-        run: |
-          # Authenticate and run verification script
-          chmod +x ../scripts/verify_db_access.sh
-          cd ..
-          ./scripts/verify_db_access.sh
 ```
 
 **Pipeline Stages:**
@@ -513,13 +505,11 @@ jobs:
 3.  **Format & Validate:** Checks code style and syntax.
 4.  **Plan:** Shows what changes would be made (runs on PR open/sync).
 5.  **Apply:** Applies the changes to GCP (runs **only** on PR approval).
-6.  **Verify:** Automatically tests Dataproc-to-Cloud SQL connectivity after deployment.
 
 **Benefits:**
 - Catches errors before merging.
 - Shows infrastructure changes in PR comments.
 - **Automated Deployment:** Infrastructure is updated as soon as the code is approved.
-- **Automated Verification:** Ensures connectivity is working immediately after deployment.
 
 ---
 

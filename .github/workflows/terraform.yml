@@ -75,6 +75,35 @@ jobs:
           TF_VAR_db_user: ${{ secrets.DB_USER }}
         run: terraform apply -auto-approve -input=false
 
+      - name: Setup Database Schema
+        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+        run: |
+          # Authenticate gcloud
+          echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          
+          # Install PostgreSQL client
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          
+          # Install Cloud SQL Proxy
+          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+          chmod +x cloud_sql_proxy
+          sudo mv cloud_sql_proxy /usr/local/bin/
+          
+          # Make setup script executable and run it
+          chmod +x ../scripts/setup_db.sh
+          cd ..
+          ./scripts/setup_db.sh
+          
+          # Cleanup key
+          rm gcloud-key.json
+
       - name: Verify Database Connectivity
         if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
         env:
