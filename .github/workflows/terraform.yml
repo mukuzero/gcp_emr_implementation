@@ -74,7 +74,11 @@ jobs:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
           TF_VAR_db_user: ${{ secrets.DB_USER }}
-        run: terraform apply -auto-approve -input=false
+        id: apply
+        run: |
+          terraform apply -auto-approve -input=false
+          echo "db_instance_name=$(terraform output -raw db_instance_name)" >> "$GITHUB_OUTPUT"
+          echo "db_connection_name=$(terraform output -raw db_connection_name)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Database Schema
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
@@ -84,6 +88,8 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
+          DB_INSTANCE_NAME: ${{ steps.apply.outputs.db_instance_name }}
+          DB_CONNECTION_NAME: ${{ steps.apply.outputs.db_connection_name }}
         run: |
           # Authenticate gcloud
           echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
@@ -111,6 +117,8 @@ jobs:
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          DB_INSTANCE_NAME: ${{ steps.apply.outputs.db_instance_name }}
+          DB_CONNECTION_NAME: ${{ steps.apply.outputs.db_connection_name }}
         run: |
           # Authenticate gcloud for the verification script
           echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
