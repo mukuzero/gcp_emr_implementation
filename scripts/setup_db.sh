@@ -52,7 +52,7 @@ echo "Using DDL file: $DDL_FILE"
 
 # Find the Cloud SQL instance
 echo "Finding Cloud SQL instance..."
-INSTANCE_NAME=$(gcloud sql instances list --format="value(name)" --filter="name~^${DB_INSTANCE_NAME_PREFIX}")
+INSTANCE_NAME=$(gcloud sql instances list --format="value(connectionName)" --filter="name~^${DB_INSTANCE_NAME_PREFIX}")
 
 if [ -z "$INSTANCE_NAME" ]; then
   echo "Error: Cloud SQL instance starting with '$DB_INSTANCE_NAME_PREFIX' not found."
@@ -82,7 +82,7 @@ echo "================================================================"
 
 # Start Cloud SQL Proxy in the background
 echo "Starting Cloud SQL Proxy..."
-cloud_sql_proxy --address 127.0.0.1 --port 5432 "$INSTANCE_NAME" &
+cloud_sql_proxy -instances="$INSTANCE_NAME"=tcp:5432 &
 PROXY_PID=$!
 
 # Wait for proxy to be ready
