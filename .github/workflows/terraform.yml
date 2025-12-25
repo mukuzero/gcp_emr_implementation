@@ -1,11 +1,12 @@
 name: "Terraform Plan"
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
-  pull_request_review:
-    types: [submitted]
 
 jobs:
   terraform:
@@ -65,7 +66,7 @@ jobs:
         run: terraform plan -input=false
 
       - name: Terraform Apply
-        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
           TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -76,7 +77,7 @@ jobs:
         run: terraform apply -auto-approve -input=false
 
       - name: Setup Database Schema
-        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
           REGION: ${{ secrets.GCP_REGION }}
@@ -106,7 +107,7 @@ jobs:
           rm gcloud-key.json
 
       - name: Verify Database Connectivity
-        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |

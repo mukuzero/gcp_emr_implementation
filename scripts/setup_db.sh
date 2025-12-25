@@ -97,6 +97,19 @@ if psql -h 127.0.0.1 -p 5432 -U "$DB_USER" -d "$DB_NAME" -f "$DDL_FILE"; then
   echo "================================================================"
   echo "DDL executed successfully!"
   echo "================================================================"
+
+  # Stop Cloud SQL Proxy to release port 5432 for load_data.sh
+  echo "Stopping Cloud SQL Proxy..."
+  kill $PROXY_PID 2>/dev/null || true
+
+  # Execute Data Loading
+  echo "Executing Data Loading Script..."
+  if ./scripts/load_data.sh; then
+    echo "Data loading completed successfully."
+  else
+    echo "Error: Data loading failed."
+    exit 1
+  fi
 else
   echo "Error: Failed to execute DDL"
   kill $PROXY_PID 2>/dev/null || true
