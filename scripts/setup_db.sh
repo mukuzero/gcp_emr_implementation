@@ -111,6 +111,8 @@ if psql -h 127.0.0.1 -p 5432 -U "$DB_USER" -d "$DB_NAME" -f "$DDL_FILE"; then
 
   # Execute Data Loading
   echo "Executing Data Loading Script..."
+  export DB_INSTANCE_NAME="$INSTANCE_NAME"
+  export DB_CONNECTION_NAME="$INSTANCE_CONNECTION_NAME"
   if ./scripts/load_data.sh; then
     echo "Data loading completed successfully."
   else

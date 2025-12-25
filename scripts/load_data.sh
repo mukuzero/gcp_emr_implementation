@@ -37,12 +37,14 @@ if [ -z "$DB_USER" ]; then
 fi
 
 # Find the Cloud SQL instance
-echo "Finding Cloud SQL instance..."
-INSTANCE_NAME=$(gcloud sql instances list --format="value(name)" --filter="name~^${DB_INSTANCE_NAME_PREFIX}")
-
-if [ -z "$INSTANCE_NAME" ]; then
-  echo "Error: Cloud SQL instance starting with '$DB_INSTANCE_NAME_PREFIX' not found."
-  exit 1
+if [ -n "$DB_CONNECTION_NAME" ]; then
+  echo "Using connection name from environment: $DB_CONNECTION_NAME"
+  INSTANCE_NAME="$DB_CONNECTION_NAME"
+  
+  if [ -z "$INSTANCE_NAME" ]; then
+    echo "Error: Cloud SQL instance starting with '$DB_INSTANCE_NAME_PREFIX' not found."
+    exit 1
+  fi
 fi
 
 echo "Found instance: $INSTANCE_NAME"
