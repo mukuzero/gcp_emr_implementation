@@ -1,6 +1,9 @@
 name: "Terraform Plan"
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -34,7 +37,7 @@ jobs:
           gcloud auth activate-service-account --key-file=gcloud-key.json
           
           # Run setup script (from terraform directory, script is in ../scripts)
-          ../scripts/setup_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
+          ../scripts/setup_terraform_backend.sh "${{ secrets.TF_BACKEND_BUCKET }}" "${{ secrets.GCP_REGION }}"
           
           # Cleanup key
           rm gcloud-key.json
@@ -61,3 +64,61 @@ jobs:
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
           TF_VAR_db_user: ${{ secrets.DB_USER }}
         run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+          TF_VAR_region: ${{ secrets.GCP_REGION }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_db_name: ${{ secrets.DB_NAME }}
+          TF_VAR_db_user: ${{ secrets.DB_USER }}
+        run: terraform apply -auto-approve -input=false
+
+      - name: Setup Database Schema
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          REGION: ${{ secrets.GCP_REGION }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+        run: |
+          # Authenticate gcloud
+          echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          
+          # Install PostgreSQL client
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          
+          # Install Cloud SQL Proxy
+          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+          chmod +x cloud_sql_proxy
+          sudo mv cloud_sql_proxy /usr/local/bin/
+          
+          # Make setup script executable and run it
+          chmod +x ../scripts/setup_db.sh
+          cd ..
+          ./scripts/setup_db.sh
+          
+          # Cleanup key
+          rm gcloud-key.json
+
+      - name: Verify Database Connectivity
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          # Authenticate gcloud for the verification script
+          echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          
+          # Make verification script executable and run it
+          chmod +x ../scripts/verify_db_access.sh
+          cd ..
+          ./scripts/verify_db_access.sh
+          
+          # Cleanup key
+          rm gcloud-key.json
