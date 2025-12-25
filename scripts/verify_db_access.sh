@@ -15,9 +15,12 @@ echo "Cluster: $CLUSTER_NAME"
 echo "----------------------------------------------------------------"
 
 # 1. Get the Cloud SQL Instance Name
-echo "Finding Cloud SQL instance..."
-# Using ~ match for regex/contains
-DB_INSTANCE_NAME=$(gcloud sql instances list --format="value(name)" --filter="name~^${DB_INSTANCE_NAME_PREFIX}")
+if [ -n "$DB_INSTANCE_NAME" ]; then
+  echo "Using instance name from environment: $DB_INSTANCE_NAME"
+else
+  echo "Finding Cloud SQL instance..."
+  DB_INSTANCE_NAME=$(gcloud sql instances list --format="value(name)" --filter="name~^${DB_INSTANCE_NAME_PREFIX}")
+fi
 
 if [ -z "$DB_INSTANCE_NAME" ]; then
   echo "Error: Cloud SQL instance starting with '$DB_INSTANCE_NAME_PREFIX' not found."
