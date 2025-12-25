@@ -88,6 +88,7 @@ jobs:
           # Authenticate gcloud
           echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
           gcloud auth activate-service-account --key-file=gcloud-key.json
+          gcloud config set project "${{ secrets.GCP_PROJECT_ID }}"
           
           # Install PostgreSQL client
           sudo apt-get update
@@ -114,6 +115,7 @@ jobs:
           # Authenticate gcloud for the verification script
           echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
           gcloud auth activate-service-account --key-file=gcloud-key.json
+          gcloud config set project "${{ secrets.GCP_PROJECT_ID }}"
           
           # Make verification script executable and run it
           chmod +x ../scripts/verify_db_access.sh
