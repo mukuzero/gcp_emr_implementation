@@ -76,3 +76,9 @@ variable "script_source_bucket_name" {
   type        = string
   default     = "script-source-bucket"
 }
+
+variable "function_source_file" {
+  description = "The name of the python file containing the function entry point"
+  type        = string
+  default     = "cloud_run_loader.py"
+}
