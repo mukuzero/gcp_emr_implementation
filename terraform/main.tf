@@ -174,10 +174,10 @@ resource "google_cloudfunctions2_function" "data_loader" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
-    
+
     # Connect to the VPC
     vpc_connector_egress_settings = "PRIVATE_RANGES_ONLY"
-    
+
     # Direct VPC Egress (requires beta provider or specific config, using standard connector approach for stability if connector exists, 
     # but since we don't have a connector resource defined, we'll try Direct VPC Egress if supported by the provider version, 
     # OR we need to create a VPC connector. 
@@ -202,11 +202,11 @@ resource "google_cloudfunctions2_function" "data_loader" {
     # It DOES NOT seem to have `network_interfaces` exposed directly in the high-level resource yet in all versions.
     # To avoid complexity/errors, I will create a `google_vpc_access_connector` resource as well, 
     # as that is the standard, robust way to ensure VPC access for Cloud Functions.
-    
+
     # Wait, the user asked to use "correct variables within vpc defined".
     # I will create a VPC connector to ensure connectivity.
     vpc_connector = google_vpc_access_connector.connector.id
-    
+
     environment_variables = {
       DB_HOST     = google_sql_database_instance.default.private_ip_address
       DB_NAME     = var.db_name

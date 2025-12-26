@@ -71,8 +71,8 @@ variable "cloud_run_function_name" {
   default     = "data-loader-function"
 }
 
-variable "script_src_bucket_name" {
-  description = "The name of the GCS bucket for  source code"
+variable "script_source_bucket_name" {
+  description = "The name of the GCS bucket for script source code"
   type        = string
-  default     = "script-src-bucket"
+  default     = "script-source-bucket"
 }
