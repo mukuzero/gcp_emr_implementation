@@ -65,3 +65,14 @@ variable "firewall_rule_name" {
   type        = string
   default     = "allow-internal-traffic"
 }
+variable "cloud_run_function_name" {
+  description = "The name of the Cloud Run Function"
+  type        = string
+  default     = "data-loader-function"
+}
+
+variable "script_source_bucket_name" {
+  description = "The name of the GCS bucket for script source code"
+  type        = string
+  default     = "script-source-bucket"
+}
