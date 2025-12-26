@@ -168,6 +168,9 @@ resource "google_cloudfunctions2_function" "data_loader" {
         object = google_storage_bucket_object.function_archive.name
       }
     }
+    environment_variables = {
+      GOOGLE_FUNCTION_SOURCE = var.function_source_file
+    }
   }
 
   service_config {
