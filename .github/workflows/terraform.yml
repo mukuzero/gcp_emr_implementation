@@ -81,38 +81,38 @@ jobs:
           echo "db_instance_name=$(terraform output -raw db_instance_name)" >> "$GITHUB_OUTPUT"
           echo "db_connection_name=$(terraform output -raw db_connection_name)" >> "$GITHUB_OUTPUT"
 
-      - name: Setup Database Schema
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          REGION: ${{ secrets.GCP_REGION }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_INSTANCE_NAME: ${{ steps.apply.outputs.db_instance_name }}
-          DB_CONNECTION_NAME: ${{ steps.apply.outputs.db_connection_name }}
-        run: |
-          # Authenticate gcloud
-          echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
-          gcloud auth activate-service-account --key-file=gcloud-key.json
-          gcloud config set project "${{ secrets.GCP_PROJECT_ID }}"
+      # - name: Setup Database Schema
+      #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      #   env:
+      #     GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      #     REGION: ${{ secrets.GCP_REGION }}
+      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #     DB_NAME: ${{ secrets.DB_NAME }}
+      #     DB_USER: ${{ secrets.DB_USER }}
+      #     DB_INSTANCE_NAME: ${{ steps.apply.outputs.db_instance_name }}
+      #     DB_CONNECTION_NAME: ${{ steps.apply.outputs.db_connection_name }}
+      #   run: |
+      #     # Authenticate gcloud
+      #     echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
+      #     gcloud auth activate-service-account --key-file=gcloud-key.json
+      #     gcloud config set project "${{ secrets.GCP_PROJECT_ID }}"
           
-          # Install PostgreSQL client
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+      #     # Install PostgreSQL client
+      #     sudo apt-get update
+      #     sudo apt-get install -y postgresql-client
           
-          # Install Cloud SQL Proxy
-          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-          chmod +x cloud_sql_proxy
-          sudo mv cloud_sql_proxy /usr/local/bin/
+      #     # Install Cloud SQL Proxy
+      #     wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+      #     chmod +x cloud_sql_proxy
+      #     sudo mv cloud_sql_proxy /usr/local/bin/
           
-          # Make setup script executable and run it
-          chmod +x ../scripts/setup_db.sh
-          cd ..
-          ./scripts/setup_db.sh
+      #     # Make setup script executable and run it
+      #     chmod +x ../scripts/setup_db.sh
+      #     cd ..
+      #     ./scripts/setup_db.sh
           
-          # Cleanup key
-          rm gcloud-key.json
+      #     # Cleanup key
+      #     rm gcloud-key.json
 
       - name: Verify Database Connectivity
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
