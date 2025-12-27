@@ -58,8 +58,35 @@ def setup_database():
     finally:
         conn.close()
 
-def load_data():
+def truncate_tables():
+    """Truncates all tables to clear existing data."""
+    logger.info("Truncating tables...")
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cur:
+            # Order matters due to foreign keys. 
+            # Truncate in reverse order of creation or use CASCADE.
+            # CASCADE is safer/easier here.
+            tables = ['transactions', 'encounters', 'patients', 'providers', 'departments', 'hospitals']
+            for table in tables:
+                cur.execute(f"TRUNCATE TABLE {table} CASCADE;")
+        conn.commit()
+        logger.info("Tables truncated successfully.")
+        return True, "Tables truncated successfully."
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"Truncate failed: {e}")
+        return False, f"Truncate failed: {str(e)}"
+    finally:
+        conn.close()
+
+def load_data(truncate=True):
     """Generates synthetic data and loads it into the database."""
+    if truncate:
+        success, msg = truncate_tables()
+        if not success:
+            return False, msg
+
     logger.info("Starting data generation and loading...")
     
     # Change to /tmp for file generation as it's the only writable directory in Cloud Run
