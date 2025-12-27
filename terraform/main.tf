@@ -175,8 +175,9 @@ resource "google_cloudfunctions2_function" "data_loader" {
 
   service_config {
     max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
+    available_memory   = "4Gi"
+    available_cpu      = "2"
+    timeout_seconds    = 300
 
     # Connect to the VPC
     vpc_connector_egress_settings = "PRIVATE_RANGES_ONLY"
