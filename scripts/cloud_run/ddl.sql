@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS departments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    PRIMARY KEY (DeptID)
+    PRIMARY KEY (hospitalID, DeptID)
 );
 
 -- Create providers table
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS providers (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    PRIMARY KEY (ProviderID)
+    PRIMARY KEY (hospitalID, ProviderID)
 );
 
 -- Create patients table
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS encounters (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    PRIMARY KEY (EncounterID)
+    PRIMARY KEY (hospitalID, EncounterID)
 );
 
 -- Create transactions table
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    PRIMARY KEY (TransactionID)
+    PRIMARY KEY (hospitalID, TransactionID)
 );
 
 -- Create indexes for better query performance
