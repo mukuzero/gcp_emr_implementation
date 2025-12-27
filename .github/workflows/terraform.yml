@@ -133,3 +133,25 @@ jobs:
           
           # Cleanup key
           rm gcloud-key.json
+
+      - name: Invoke Cloud Run Data Loader
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          # Authenticate gcloud
+          echo "$GOOGLE_CREDENTIALS" > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          
+          # Get Function URL
+          FUNCTION_URL=$(terraform output -raw function_uri)
+          echo "Invoking Cloud Run Function at: $FUNCTION_URL"
+          
+          # Invoke Function
+          curl -X POST "$FUNCTION_URL" \
+            -H "Authorization: bearer $(gcloud auth print-identity-token)" \
+            -H "Content-Type: application/json" \
+            -d '{ "action": "setup_and_load" }'
+            
+          # Cleanup key
+          rm gcloud-key.json

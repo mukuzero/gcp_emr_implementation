@@ -228,7 +228,4 @@ resource "google_vpc_access_connector" "connector" {
   ip_cidr_range = "10.8.0.0/28" # /28 is the minimum required
 }
 
-# Output the URL
-output "function_uri" {
-  value = google_cloudfunctions2_function.data_loader.service_config[0].uri
-}
+
