@@ -37,6 +37,12 @@ def setup_database():
     conn = get_db_connection()
     try:
         with conn.cursor() as cur:
+            # Drop tables to ensure fresh schema (needed for composite PK change)
+            logger.info("Dropping existing tables...")
+            tables = ['transactions', 'encounters', 'patients', 'providers', 'departments', 'hospitals']
+            for table in tables:
+                cur.execute(f"DROP TABLE IF EXISTS {table} CASCADE;")
+            
             # Read DDL file
             # Note: In Cloud Run, the source code is in the working directory
             with open('ddl.sql', 'r') as f:
