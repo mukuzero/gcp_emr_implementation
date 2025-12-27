@@ -53,6 +53,7 @@ def setup_database():
             # Simple way: remove lines starting with \echo
             cleaned_ddl = "\n".join([line for line in ddl_script.splitlines() if not line.strip().startswith('\\')])
             
+            logger.info("Executing DDL...")
             cur.execute(cleaned_ddl)
         conn.commit()
         logger.info("Database setup completed successfully.")
